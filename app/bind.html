@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>账号绑定</title>
+  <meta name="description" content="mxd">
+  <meta name="viewport" content="initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+  <meta name="format-detection" content="telephone=no">
+  <!-- safari full screen -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta id="apple-mobile-web-app-title" name="apple-mobile-web-app-title" content="mxd">
+  <!--build:css css/main.min.css-->
+  <link rel="stylesheet" type="text/css" href="css/index.css">
+  <!--endbuild-->
+  <script type="text/javascript" src="https://m.nonobank.com/nonoutil/js/tongdun.js"></script>
+  <script type="text/javascript" src="https://m.nonobank.com/tingYun/tingyun-rum-nono-activity.js" async></script>
+</head>
+
+<body>
+  <section id='app'>
+  <div class="wrapper" v-if="isbind">
+    <form class="bind">
+      <div class="logo"><img src="images/logo.png" alt=""></div>
+      <div class="user-input row row-center">
+        <input class="col" type="tel" placeholder='请输入手机号' maxlength="11" v-model='user.phone' v-focus="focusStatus == 3" @blur='blur()'>
+      </div>
+      <div class="code-input">
+        <div class="row code-msg">
+          <div class="user-input col">
+            <input class="col" type="tel" maxlength="6" placeholder="短信验证码" v-model='user.codeMsg' v-focus="focusStatus == 2">
+            <span class="del" @click='del()'><img src="images/delete.png" alt=""></span>
+            <span class="line"></span>
+            <span class="code-change gray" v-if='timeCount > 0' v-cloak>重新获取({{timeCount}}s)</span>
+            <span class="code-change" v-if='timeCount <= 0' @click='checkPhoneReg()'>获取验证码</span>
+          </div>
+        </div>
+      </div>
+    </form>
+    
+    <div class="bind">
+      <button class="btn margin-20" type="button" :class="{'active':btnActive}" @click="bind()">绑定</button>
+      <p class="gray text-center" @click="goRegister()">注册领取新手礼包</p>
+    </div>
+  </div>
+    <loading :show='isLoading'></loading>
+    <toast-msg :msg='toastMsg' @hide='hide()'></toast-msg>
+  </section>
+  <!-- build:js js/vendor.js -->
+  <!-- bower:js -->
+  <script src="/bower_components/vue/dist/vue.min.js"></script>
+  <script src="/bower_components/js-md5/src/md5.js"></script>
+  <script src="/bower_components/es6-promise/es6-promise.auto.min.js"></script>
+  <script src="/bower_components/axios/dist/axios.js"></script>
+  <!-- endbower -->
+  <!--endbuild-->
+  <!--build:js js/util.min.js -->
+  <script src="js/utils.js"></script>
+  <script src="js/qs.js"></script>
+  <script src="js/encryptSign.js"></script>
+  <script src="js/http.js"></script>
+  <!--endbuild-->
+  <!--build:js js/bind.min.js -->
+  <script src="js/components_js/loading.js"></script>
+  <script src="js/components_js/toast.js"></script>
+  <script src="js/src/bind.js"></script>
+  <!--endbuild-->
+</body>
+
+</html>

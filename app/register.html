@@ -1,0 +1,124 @@
+<!-- <!DOCTYPE html> -->
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>手机快捷注册</title>
+  <meta name="description" content="mxd">
+  <meta name="viewport" content="initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+  <meta name="format-detection" content="telephone=no">
+  <!-- safari full screen -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta id="apple-mobile-web-app-title" name="apple-mobile-web-app-title" content="mxd">
+  <!--build:css css/main.min.css-->
+  <link rel="stylesheet" type="text/css" href="css/index.css">
+  <!--endbuild-->
+  <script type="text/javascript" src="https://m.nonobank.com/nonoutil/js/tongdun.js"></script>
+  <script type="text/javascript" src="https://m.nonobank.com/tingYun/tingyun-rum-nono-activity.js" async></script>
+</head>
+
+<body>
+  <section id='app'>
+    <form>
+      <div class="logo"><img src="images/logo.png" alt=""></div>
+      <div class="user-input row row-center">
+        <input class="col" type="tel" placeholder='请输入手机号' maxlength="11" v-model='user.phone' v-focus="focusStatus == 3" @blur='blur()'>
+      </div>
+
+      <div class="relative code-input">
+        <div class="row code-img" v-if="timeCount < 0">
+          <div class="user-input col">
+            <input class="col" type="text" readonly="value" placeholder='请输入验证码'>
+            <span class="line"></span>
+            <span class="code-change" @click="getImgMask()" v-cloak>获取验证码</span>
+          </div>
+        </div>
+        <div class="row code-msg" v-if="timeCount >= 0">
+          <div class="user-input col">
+            <input class="col" type="tel" maxlength="6" placeholder="短信验证码" v-model='user.codeMsg' v-focus="focusStatus == 2">
+            <span class="del" @click='del()'><img src="images/delete.png" alt=""></span>
+            <span class="line"></span>
+            <span class="code-change gray" v-if='timeCount > 0' v-cloak>重新发送({{timeCount}}s)</span>
+            <span class="code-change" v-if='timeCount <= 0' @click="getCode('showImgMask')">获取验证码</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="mask" class="row row-center" v-if="imgMask">
+        <div class="inner text-center">
+          <div class="text-center title">
+            请输入图形验证码
+            <span class="close" @click="closeImgMask()"><img src="images/close.png" alt=""></span>
+          </div>
+          <span class="code-change" @click="refreshCaptcha()" v-cloak><img :src="imgSrc"></span>
+          <div class="user-input col">
+            <input class="col" type="text" maxlength="4" placeholder='输入图示4位字符' v-model='user.codeImg' v-focus="focusStatus == 1">
+          </div>
+          <button class="btn" type="button" @click='sure()'>确定</button>
+        </div>
+      </div>
+    </form>
+    <div class="reg">
+      <div class="select gray">
+        <p class="margin-bottom">选择新手礼包</p>
+        <div class="row row-center">
+          <div class="col text-center item" :class="{'nono-active':nonoActive}" @click="nonoSelect()">
+            诺诺大礼包
+          </div>
+          <div class="text-center fill">
+          </div>
+          <div class="col text-center item" :class="{'caishen-active':caishenActive}" @click="caishenSelect()">
+            财神大礼包
+          </div>
+        </div>
+      </div>
+      <div class="row agreement margin-40">
+        <input type="checkbox" id='autobuild' v-model='user.autobuild'>
+        <label for="autobuild" class="col">
+          <span class='checked row row-center'></span>
+          <p class="col gray">未注册的手机将为你自动创建账户</p>
+        </label>
+      </div>
+      <div class="row agreement margin-20" v-if="!caishenActive">
+        <input type="checkbox" id='agreement' v-model='user.agreement'>
+        <label for="agreement" class="col">
+          <span class='checked row row-center'></span>
+          <!-- <p class="col gray" @click='goRegPrivacy()'>同意诺诺镑客《注册协议与隐私条款》</p> -->
+          <p class="col gray">同意诺诺镑客<a class="gray" href="https://m.nonobank.com/agreements/nono/link/service.html" class="color-dark">《服务协议》</a>和<a class="gray" href="https://m.nonobank.com/agreements/nono/link/privacy.html" class="color-dark">《隐私条款》</a></p>
+        </label>
+      </div>
+      <!-- <div class="row agreement margin-20" v-if="caishenActive">
+        <input type="checkbox" id='agreement' v-model='user.agreement'>
+        <label for="agreement" class="col">
+          <span class='checked row row-center'></span>
+          <p class="col gray">同意《财神爷爷注册协议》</p>
+        </label>
+      </div> -->
+      <button class="btn" type="button" :class="{'active':btnActive}" @click="register()">注册</button>
+    </div>
+    <loading :show='isLoading'></loading>
+    <toast-msg :msg='toastMsg' @hide='hide()'></toast-msg>
+  </section>
+  <!-- build:js js/vendor.js -->
+  <!-- bower:js -->
+  <script src="/bower_components/vue/dist/vue.min.js"></script>
+  <script src="/bower_components/js-md5/src/md5.js"></script>
+  <script src="/bower_components/es6-promise/es6-promise.auto.min.js"></script>
+  <script src="/bower_components/axios/dist/axios.js"></script>
+  <!-- endbower -->
+  <!--endbuild-->
+  <!--build:js js/util.min.js -->
+  <script src="js/utils.js"></script>
+  <script src="js/qs.js"></script>
+  <script src="js/encryptSign.js"></script>
+  <script src="js/http.js"></script>
+  <!--endbuild-->
+  <!--build:js js/register.min.js -->
+  <script src="js/components_js/loading.js"></script>
+  <script src="js/components_js/toast.js"></script>
+  <script src="js/src/register.js"></script>
+  <!--endbuild-->
+</body>
+
+</html>
